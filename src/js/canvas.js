@@ -338,7 +338,7 @@ function drawSecretDoorEdge(ctx, tileX, tileY, tileSize, edgePosition) {
       
       // Draw the 'S' marker
       ctx.setLineDash([]);
-      ctx.font = `${tileSize / 3}px Arial`;
+      ctx.font = `bold ${tileSize / 3}px Arial`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = ctx.strokeStyle;
@@ -351,7 +351,7 @@ function drawSecretDoorEdge(ctx, tileX, tileY, tileSize, edgePosition) {
       ctx.stroke();
       
       ctx.setLineDash([]);
-      ctx.font = `${tileSize / 3}px Arial`;
+      ctx.font = `bold ${tileSize / 3}px Arial`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = ctx.strokeStyle;
@@ -364,7 +364,7 @@ function drawSecretDoorEdge(ctx, tileX, tileY, tileSize, edgePosition) {
       ctx.stroke();
       
       ctx.setLineDash([]);
-      ctx.font = `${tileSize / 3}px Arial`;
+      ctx.font = `bold ${tileSize / 3}px Arial`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = ctx.strokeStyle;
@@ -377,7 +377,7 @@ function drawSecretDoorEdge(ctx, tileX, tileY, tileSize, edgePosition) {
       ctx.stroke();
       
       ctx.setLineDash([]);
-      ctx.font = `${tileSize / 3}px Arial`;
+      ctx.font = `bold ${tileSize / 3}px Arial`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = ctx.strokeStyle;
@@ -401,7 +401,7 @@ function drawTrapEdge(ctx, tileX, tileY, tileSize, edgePosition) {
       ctx.stroke();
       
       // Draw the trap marker
-      ctx.font = `${tileSize / 3}px Arial`;
+      ctx.font = `bold ${tileSize / 3}px Arial`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = ctx.strokeStyle;
@@ -413,7 +413,7 @@ function drawTrapEdge(ctx, tileX, tileY, tileSize, edgePosition) {
       ctx.lineTo(tileX + tileSize, tileY + tileSize);
       ctx.stroke();
       
-      ctx.font = `${tileSize / 3}px Arial`;
+      ctx.font = `bold ${tileSize / 3}px Arial`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = ctx.strokeStyle;
@@ -425,7 +425,7 @@ function drawTrapEdge(ctx, tileX, tileY, tileSize, edgePosition) {
       ctx.lineTo(tileX + tileSize, tileY + tileSize);
       ctx.stroke();
       
-      ctx.font = `${tileSize / 3}px Arial`;
+      ctx.font = `bold ${tileSize / 3}px Arial`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = ctx.strokeStyle;
@@ -437,7 +437,7 @@ function drawTrapEdge(ctx, tileX, tileY, tileSize, edgePosition) {
       ctx.lineTo(tileX, tileY + tileSize);
       ctx.stroke();
       
-      ctx.font = `${tileSize / 3}px Arial`;
+      ctx.font = `bold ${tileSize / 3}px Arial`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = ctx.strokeStyle;
@@ -458,17 +458,12 @@ function drawLeverEdge(ctx, tileX, tileY, tileSize, edgePosition) {
       ctx.lineTo(tileX + tileSize, tileY);
       ctx.stroke();
       
-      // Draw the lever symbol (like a switch/handle)
-      ctx.beginPath();
-      ctx.moveTo(tileX + tileSize * 0.4, tileY + tileSize * 0.25);
-      ctx.lineTo(tileX + tileSize * 0.6, tileY + tileSize * 0.25);
-      ctx.stroke();
-      
-      // Draw the handle
-      ctx.beginPath();
-      ctx.moveTo(tileX + tileSize * 0.5, tileY + tileSize * 0.05);
-      ctx.lineTo(tileX + tileSize * 0.5, tileY + tileSize * 0.25);
-      ctx.stroke();
+      // Draw the 'L' marker
+      ctx.font = `bold ${tileSize / 3}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = ctx.strokeStyle;
+      ctx.fillText('L', tileX + tileSize / 2, tileY + tileSize / 4);
       break;
       
     case 'right':
@@ -477,17 +472,12 @@ function drawLeverEdge(ctx, tileX, tileY, tileSize, edgePosition) {
       ctx.lineTo(tileX + tileSize, tileY + tileSize);
       ctx.stroke();
       
-      // Draw the lever base
-      ctx.beginPath();
-      ctx.moveTo(tileX + tileSize * 0.75, tileY + tileSize * 0.4);
-      ctx.lineTo(tileX + tileSize * 0.75, tileY + tileSize * 0.6);
-      ctx.stroke();
-      
-      // Draw the handle
-      ctx.beginPath();
-      ctx.moveTo(tileX + tileSize * 0.95, tileY + tileSize * 0.5);
-      ctx.lineTo(tileX + tileSize * 0.75, tileY + tileSize * 0.5);
-      ctx.stroke();
+      // Draw the 'L' marker
+      ctx.font = `bold ${tileSize / 3}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = ctx.strokeStyle;
+      ctx.fillText('L', tileX + tileSize * 3/4, tileY + tileSize / 2);
       break;
       
     case 'bottom':
@@ -496,17 +486,12 @@ function drawLeverEdge(ctx, tileX, tileY, tileSize, edgePosition) {
       ctx.lineTo(tileX + tileSize, tileY + tileSize);
       ctx.stroke();
       
-      // Draw the lever base
-      ctx.beginPath();
-      ctx.moveTo(tileX + tileSize * 0.4, tileY + tileSize * 0.75);
-      ctx.lineTo(tileX + tileSize * 0.6, tileY + tileSize * 0.75);
-      ctx.stroke();
-      
-      // Draw the handle
-      ctx.beginPath();
-      ctx.moveTo(tileX + tileSize * 0.5, tileY + tileSize * 0.95);
-      ctx.lineTo(tileX + tileSize * 0.5, tileY + tileSize * 0.75);
-      ctx.stroke();
+      // Draw the 'L' marker
+      ctx.font = `bold ${tileSize / 3}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = ctx.strokeStyle;
+      ctx.fillText('L', tileX + tileSize / 2, tileY + tileSize * 3/4);
       break;
       
     case 'left':
@@ -515,17 +500,12 @@ function drawLeverEdge(ctx, tileX, tileY, tileSize, edgePosition) {
       ctx.lineTo(tileX, tileY + tileSize);
       ctx.stroke();
       
-      // Draw the lever base
-      ctx.beginPath();
-      ctx.moveTo(tileX + tileSize * 0.25, tileY + tileSize * 0.4);
-      ctx.lineTo(tileX + tileSize * 0.25, tileY + tileSize * 0.6);
-      ctx.stroke();
-      
-      // Draw the handle
-      ctx.beginPath();
-      ctx.moveTo(tileX + tileSize * 0.05, tileY + tileSize * 0.5);
-      ctx.lineTo(tileX + tileSize * 0.25, tileY + tileSize * 0.5);
-      ctx.stroke();
+      // Draw the 'L' marker
+      ctx.font = `bold ${tileSize / 3}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = ctx.strokeStyle;
+      ctx.fillText('L', tileX + tileSize / 4, tileY + tileSize / 2);
       break;
   }
 }

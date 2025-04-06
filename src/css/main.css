@@ -201,6 +201,7 @@ main {
 
 .icon {
   font-size: 18px;
+  font-weight: bold;
   display: flex;
   justify-content: center;
   align-items: center;
