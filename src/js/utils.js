@@ -28,6 +28,11 @@ function hideModal(modalId) {
 
 // Set up dropdown menus
 function setupDropdowns() {
+  // First, hide all dropdown menus
+  document.querySelectorAll('.dropdown-menu').forEach(menu => {
+    menu.style.cssText = 'display: none !important';
+  });
+  
   const dropdowns = document.querySelectorAll('.dropdown');
   
   dropdowns.forEach(dropdown => {
@@ -37,27 +42,27 @@ function setupDropdowns() {
     if (toggle && menu) {
       // Show menu on hover
       dropdown.addEventListener('mouseenter', () => {
-        menu.style.display = 'block';
+        menu.style.cssText = 'display: block !important';
       });
       
       // Hide menu when mouse leaves
       dropdown.addEventListener('mouseleave', () => {
-        menu.style.display = 'none';
+        menu.style.cssText = 'display: none !important';
       });
       
       // Toggle menu on click (for mobile)
       toggle.addEventListener('click', (e) => {
         e.preventDefault();
-        if (menu.style.display === 'block') {
-          menu.style.display = 'none';
+        if (window.getComputedStyle(menu).display === 'block') {
+          menu.style.cssText = 'display: none !important';
         } else {
           // Hide all other menus first
           document.querySelectorAll('.dropdown-menu').forEach(m => {
             if (m !== menu) {
-              m.style.display = 'none';
+              m.style.cssText = 'display: none !important';
             }
           });
-          menu.style.display = 'block';
+          menu.style.cssText = 'display: block !important';
         }
       });
     }
@@ -67,7 +72,7 @@ function setupDropdowns() {
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.dropdown')) {
       document.querySelectorAll('.dropdown-menu').forEach(menu => {
-        menu.style.display = 'none';
+        menu.style.cssText = 'display: none !important';
       });
     }
   });
