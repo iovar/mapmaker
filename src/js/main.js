@@ -395,15 +395,19 @@ function setupCanvasEventListeners() {
         let assetWidth = state.selectedAsset.width || 1;
         let assetHeight = state.selectedAsset.height || 1;
         
-        // For 90 or 270 degree rotations, swap width and height
+        // For 90 or 270 degree rotations, swap width and height for boundary checks
+        let effectiveWidth = assetWidth;
+        let effectiveHeight = assetHeight;
+        
         if (state.assetRotation === 90 || state.assetRotation === 270) {
-          [assetWidth, assetHeight] = [assetHeight, assetWidth];
+          effectiveWidth = assetHeight;
+          effectiveHeight = assetWidth;
         }
         
         // Check if the asset would exceed map boundaries
-        if (x + assetWidth > state.map[0].length || y + assetHeight > state.map.length) {
+        if (x + effectiveWidth > state.map[0].length || y + effectiveHeight > state.map.length) {
           // Asset doesn't fit, show alert and return
-          alert(`This asset needs ${assetWidth}x${assetHeight} tiles of space, which exceeds the map boundaries at this position.`);
+          alert(`This asset needs ${effectiveWidth}x${effectiveHeight} tiles of space, which exceeds the map boundaries at this position.`);
           return;
         }
         
@@ -414,8 +418,8 @@ function setupCanvasEventListeners() {
         
         // Mark other tiles as empty to prevent drawing in them
         // This ensures the multi-tile asset is visible
-        for (let offsetY = 0; offsetY < assetHeight; offsetY++) {
-          for (let offsetX = 0; offsetX < assetWidth; offsetX++) {
+        for (let offsetY = 0; offsetY < effectiveHeight; offsetY++) {
+          for (let offsetX = 0; offsetX < effectiveWidth; offsetX++) {
             // Skip the top-left tile as it's already set
             if (offsetX === 0 && offsetY === 0) continue;
             
@@ -532,13 +536,17 @@ function setupCanvasEventListeners() {
         let assetWidth = state.selectedAsset.width || 1;
         let assetHeight = state.selectedAsset.height || 1;
         
-        // For 90 or 270 degree rotations, swap width and height
+        // For 90 or 270 degree rotations, swap width and height for boundary checks
+        let effectiveWidth = assetWidth;
+        let effectiveHeight = assetHeight;
+        
         if (state.assetRotation === 90 || state.assetRotation === 270) {
-          [assetWidth, assetHeight] = [assetHeight, assetWidth];
+          effectiveWidth = assetHeight;
+          effectiveHeight = assetWidth;
         }
         
         // Check if the asset would exceed map boundaries
-        if (x + assetWidth > state.map[0].length || y + assetHeight > state.map.length) {
+        if (x + effectiveWidth > state.map[0].length || y + effectiveHeight > state.map.length) {
           return; // Asset doesn't fit, skip placement
         }
         
@@ -548,8 +556,8 @@ function setupCanvasEventListeners() {
         state.map[y][x].rotation = state.assetRotation;
         
         // Mark other tiles as empty to prevent drawing in them
-        for (let offsetY = 0; offsetY < assetHeight; offsetY++) {
-          for (let offsetX = 0; offsetX < assetWidth; offsetX++) {
+        for (let offsetY = 0; offsetY < effectiveHeight; offsetY++) {
+          for (let offsetX = 0; offsetX < effectiveWidth; offsetX++) {
             // Skip the top-left tile as it's already set
             if (offsetX === 0 && offsetY === 0) continue;
             
