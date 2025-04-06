@@ -411,10 +411,15 @@ function setupCanvasEventListeners() {
           return;
         }
         
-        // Place the asset in the top-left tile with current rotation
+        // Place the asset in the top-left tile with current rotation and dimensions
         state.map[y][x].type = 'asset';
         state.map[y][x].asset = state.selectedAsset.name;
         state.map[y][x].rotation = state.assetRotation;
+        state.map[y][x].originalWidth = assetWidth;
+        state.map[y][x].originalHeight = assetHeight;
+        // Store the effective dimensions after rotation
+        state.map[y][x].effectiveWidth = effectiveWidth;
+        state.map[y][x].effectiveHeight = effectiveHeight;
         
         // Mark other tiles as empty to prevent drawing in them
         // This ensures the multi-tile asset is visible
@@ -550,10 +555,15 @@ function setupCanvasEventListeners() {
           return; // Asset doesn't fit, skip placement
         }
         
-        // Place the asset in the top-left tile with current rotation
+        // Place the asset in the top-left tile with current rotation and dimensions
         state.map[y][x].type = 'asset';
         state.map[y][x].asset = state.selectedAsset.name;
         state.map[y][x].rotation = state.assetRotation;
+        state.map[y][x].originalWidth = assetWidth;
+        state.map[y][x].originalHeight = assetHeight;
+        // Store the effective dimensions after rotation
+        state.map[y][x].effectiveWidth = effectiveWidth;
+        state.map[y][x].effectiveHeight = effectiveHeight;
         
         // Mark other tiles as empty to prevent drawing in them
         for (let offsetY = 0; offsetY < effectiveHeight; offsetY++) {
@@ -787,6 +797,10 @@ function redrawCanvas() {
       } else if (tile.type === 'asset' && tile.asset) {
         const asset = findAssetByName(state.assets, state.theme, tile.asset);
         if (asset) {
+          // Get the original dimensions from the asset or the stored values
+          const originalWidth = tile.originalWidth || asset.width || 1;
+          const originalHeight = tile.originalHeight || asset.height || 1;
+          
           // Pass the asset dimensions and rotation to drawTile
           drawTile(
             ctx, 
@@ -795,8 +809,8 @@ function redrawCanvas() {
             state.tileSize, 
             null, 
             asset.path, 
-            asset.width, 
-            asset.height, 
+            originalWidth, 
+            originalHeight, 
             tile.rotation || 0
           );
         }
