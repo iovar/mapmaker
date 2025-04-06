@@ -37,7 +37,7 @@ function drawGrid(ctx, width, height, tileSize) {
 }
 
 // Draw a tile
-function drawTile(ctx, x, y, tileSize, fillColor, assetPath) {
+function drawTile(ctx, x, y, tileSize, fillColor, assetPath, assetWidth = 1, assetHeight = 1) {
   const tileX = x * tileSize;
   const tileY = y * tileSize;
   
@@ -48,14 +48,17 @@ function drawTile(ctx, x, y, tileSize, fillColor, assetPath) {
     const img = new Image();
     img.src = assetPath;
     
+    const drawWidth = tileSize * assetWidth;
+    const drawHeight = tileSize * assetHeight;
+    
     // Use a closure to ensure the image is drawn only after loading
     img.onload = () => {
-      ctx.drawImage(img, tileX, tileY, tileSize, tileSize);
+      ctx.drawImage(img, tileX, tileY, drawWidth, drawHeight);
     };
     
     // For already loaded images, draw immediately
     if (img.complete) {
-      ctx.drawImage(img, tileX, tileY, tileSize, tileSize);
+      ctx.drawImage(img, tileX, tileY, drawWidth, drawHeight);
     }
   } else {
     // Empty tile (white background)

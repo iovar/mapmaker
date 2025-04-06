@@ -215,6 +215,7 @@ main {
   width: 100%;
   min-width: 0;
   overflow: hidden;
+  position: relative;
 }
 
 .asset-item:hover {
@@ -243,6 +244,18 @@ main {
   width: 100%;
   padding: 0 1px;
   max-width: 100%;
+}
+
+.size-indicator {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  font-size: 0.6rem;
+  padding: 1px 3px;
+  border-radius: 3px;
+  z-index: 2;
 }
 
 .canvas-container {

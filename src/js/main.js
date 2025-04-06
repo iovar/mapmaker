@@ -239,6 +239,14 @@ function populateAssetList() {
       .replace(/([A-Z])/g, ' $1') // Add space before capital letters
       .replace(/^\s+/, '') // Remove leading space
       .trim();
+      
+    // Add size indicator for multi-tile assets
+    if (asset.width > 1 || asset.height > 1) {
+      const sizeIndicator = document.createElement('div');
+      sizeIndicator.className = 'size-indicator';
+      sizeIndicator.textContent = `${asset.width}×${asset.height}`;
+      assetItem.appendChild(sizeIndicator);
+    }
     
     assetItem.appendChild(img);
     assetItem.appendChild(span);
@@ -351,8 +359,32 @@ function setupCanvasEventListeners() {
       saveToHistory();
       
       if (state.selectedAsset) {
+        // Check if multi-tile asset fits
+        const assetWidth = state.selectedAsset.width || 1;
+        const assetHeight = state.selectedAsset.height || 1;
+        
+        // Check if the asset would exceed map boundaries
+        if (x + assetWidth > state.map[0].length || y + assetHeight > state.map.length) {
+          // Asset doesn't fit, show alert and return
+          alert(`This asset needs ${assetWidth}x${assetHeight} tiles of space, which exceeds the map boundaries at this position.`);
+          return;
+        }
+        
+        // Place the asset in the top-left tile
         state.map[y][x].type = 'asset';
         state.map[y][x].asset = state.selectedAsset.name;
+        
+        // Mark other tiles as empty to prevent drawing in them
+        // This ensures the multi-tile asset is visible
+        for (let offsetY = 0; offsetY < assetHeight; offsetY++) {
+          for (let offsetX = 0; offsetX < assetWidth; offsetX++) {
+            // Skip the top-left tile as it's already set
+            if (offsetX === 0 && offsetY === 0) continue;
+            
+            // Clear other tiles that will be covered by this asset
+            clearTile(state.map, x + offsetX, y + offsetY);
+          }
+        }
       } else {
         state.map[y][x].type = 'fill';
         state.map[y][x].asset = null;
@@ -458,8 +490,29 @@ function setupCanvasEventListeners() {
       state.selection.endY = y;
     } else if (state.selectedTool === 'fill') {
       if (state.selectedAsset) {
+        // Check if multi-tile asset fits
+        const assetWidth = state.selectedAsset.width || 1;
+        const assetHeight = state.selectedAsset.height || 1;
+        
+        // Check if the asset would exceed map boundaries
+        if (x + assetWidth > state.map[0].length || y + assetHeight > state.map.length) {
+          return; // Asset doesn't fit, skip placement
+        }
+        
+        // Place the asset in the top-left tile
         state.map[y][x].type = 'asset';
         state.map[y][x].asset = state.selectedAsset.name;
+        
+        // Mark other tiles as empty to prevent drawing in them
+        for (let offsetY = 0; offsetY < assetHeight; offsetY++) {
+          for (let offsetX = 0; offsetX < assetWidth; offsetX++) {
+            // Skip the top-left tile as it's already set
+            if (offsetX === 0 && offsetY === 0) continue;
+            
+            // Clear other tiles that will be covered by this asset
+            clearTile(state.map, x + offsetX, y + offsetY);
+          }
+        }
       } else {
         state.map[y][x].type = 'fill';
         state.map[y][x].asset = null;
@@ -677,7 +730,8 @@ function redrawCanvas() {
       } else if (tile.type === 'asset' && tile.asset) {
         const asset = findAssetByName(state.assets, state.theme, tile.asset);
         if (asset) {
-          drawTile(ctx, x, y, state.tileSize, null, asset.path);
+          // Pass the asset dimensions to drawTile
+          drawTile(ctx, x, y, state.tileSize, null, asset.path, asset.width, asset.height);
         }
       }
       

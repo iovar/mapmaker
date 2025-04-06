@@ -46,11 +46,16 @@ async function loadThemeAssets(themeName) {
       const baseAssets = getDefaultAssetList(themeName);
       
       baseAssets.forEach(assetName => {
+        // Extract dimensions from the asset name (e.g., "TableLong2x1" -> width=2, height=1)
+        const dimensionMatch = assetName.match(/(\d+)x(\d+)$/);
+        const width = dimensionMatch ? parseInt(dimensionMatch[1], 10) : 1;
+        const height = dimensionMatch ? parseInt(dimensionMatch[2], 10) : 1;
+        
         themeAssets.push({
           name: assetName,
           path: `/src/assets/${themeName}/${assetName}.png`,
-          width: 1,
-          height: 1
+          width: width,
+          height: height
         });
       });
     }
