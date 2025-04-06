@@ -7,7 +7,7 @@
   --hover-color: rgba(86, 146, 186, 0.2);
   --active-color: rgba(86, 146, 186, 0.5);
   --header-height: 50px;
-  --toolbar-width: 280px;
+  --toolbar-width: 260px;
   --classic-dungeon-color: #000;
   --old-school-blue-color: #5692ba;
 }
@@ -101,11 +101,12 @@ main {
 
 .toolbar {
   width: var(--toolbar-width);
+  max-width: 100%;
   background-color: white;
   border-right: 1px solid var(--border-color);
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 15px;
+  padding: 12px;
 }
 
 .toolbar-section {
@@ -195,7 +196,7 @@ main {
 
 .asset-container {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 5px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -205,12 +206,15 @@ main {
 .asset-item {
   border: 1px solid var(--border-color);
   border-radius: 3px;
-  padding: 4px;
+  padding: 3px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   width: 100%;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .asset-item:hover {
@@ -223,9 +227,10 @@ main {
 }
 
 .asset-item img {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
+  flex-shrink: 0;
 }
 
 .asset-item span {
@@ -236,6 +241,7 @@ main {
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
+  padding: 0 2px;
   max-width: 100%;
 }
 
@@ -358,14 +364,15 @@ main {
     border-bottom: 1px solid var(--border-color);
     overflow-x: auto;
     display: flex;
+    padding: 8px;
   }
   
   .toolbar-section {
-    min-width: 220px;
-    margin-right: 15px;
+    min-width: 180px;
+    margin-right: 12px;
     border-bottom: none;
     border-right: 1px solid var(--border-color);
-    padding-right: 15px;
+    padding-right: 12px;
   }
   
   .toolbar-section:last-child {
@@ -374,15 +381,34 @@ main {
   
   .asset-container {
     max-height: 100px;
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
   }
   
   .asset-item {
-    width: auto;
-    min-width: 40px;
+    padding: 2px;
   }
   
   .asset-item img {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
+  }
+  
+  .asset-item span {
+    font-size: 0.65rem;
+  }
+}
+
+/* Small screens */
+@media (max-width: 480px) {
+  .toolbar-section {
+    min-width: 160px;
+  }
+  
+  .asset-container {
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  }
+  
+  .toolbar-item label {
+    font-size: 0.8rem;
   }
 }
