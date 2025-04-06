@@ -26,6 +26,53 @@ function hideModal(modalId) {
   }
 }
 
+// Set up dropdown menus
+function setupDropdowns() {
+  const dropdowns = document.querySelectorAll('.dropdown');
+  
+  dropdowns.forEach(dropdown => {
+    const toggle = dropdown.querySelector('.dropdown-toggle');
+    const menu = dropdown.querySelector('.dropdown-menu');
+    
+    if (toggle && menu) {
+      // Show menu on hover
+      dropdown.addEventListener('mouseenter', () => {
+        menu.style.display = 'block';
+      });
+      
+      // Hide menu when mouse leaves
+      dropdown.addEventListener('mouseleave', () => {
+        menu.style.display = 'none';
+      });
+      
+      // Toggle menu on click (for mobile)
+      toggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (menu.style.display === 'block') {
+          menu.style.display = 'none';
+        } else {
+          // Hide all other menus first
+          document.querySelectorAll('.dropdown-menu').forEach(m => {
+            if (m !== menu) {
+              m.style.display = 'none';
+            }
+          });
+          menu.style.display = 'block';
+        }
+      });
+    }
+  });
+  
+  // Hide all menus when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.dropdown')) {
+      document.querySelectorAll('.dropdown-menu').forEach(menu => {
+        menu.style.display = 'none';
+      });
+    }
+  });
+}
+
 // Generate a UUID
 function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -107,6 +154,7 @@ export {
   debounce,
   showModal,
   hideModal,
+  setupDropdowns,
   generateUUID,
   distance,
   rgbToHex,

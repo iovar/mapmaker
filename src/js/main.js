@@ -2,7 +2,7 @@
 import { initCanvas, setupCanvas, drawGrid, drawTile, drawEdge, clearTile } from './canvas.js';
 import { loadAssets, getAssetsByTheme } from './assetManager.js';
 import { saveMap, loadMap, exportPNG } from './mapSaver.js';
-import { showModal, hideModal, debounce } from './utils.js';
+import { showModal, hideModal, debounce, setupDropdowns } from './utils.js';
 
 // Application state
 const state = {
@@ -111,6 +111,9 @@ async function initializeApp() {
   
   // Set up canvas event listeners
   setupCanvasEventListeners();
+  
+  // Set up dropdown menus
+  setupDropdowns();
   
   // Populate asset list initially
   populateAssetList();
