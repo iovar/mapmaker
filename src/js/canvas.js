@@ -458,59 +458,73 @@ function drawLeverEdge(ctx, tileX, tileY, tileSize, edgePosition) {
       ctx.lineTo(tileX + tileSize, tileY);
       ctx.stroke();
       
-      // Draw the lever symbol
+      // Draw the lever symbol (like a switch/handle)
       ctx.beginPath();
-      ctx.arc(tileX + tileSize / 2, tileY + tileSize / 4, tileSize / 8, 0, Math.PI * 2);
+      ctx.moveTo(tileX + tileSize * 0.4, tileY + tileSize * 0.25);
+      ctx.lineTo(tileX + tileSize * 0.6, tileY + tileSize * 0.25);
       ctx.stroke();
       
+      // Draw the handle
       ctx.beginPath();
-      ctx.moveTo(tileX + tileSize / 2, tileY + tileSize / 4);
-      ctx.lineTo(tileX + tileSize * 3/4, tileY + tileSize / 8);
+      ctx.moveTo(tileX + tileSize * 0.5, tileY + tileSize * 0.05);
+      ctx.lineTo(tileX + tileSize * 0.5, tileY + tileSize * 0.25);
       ctx.stroke();
       break;
+      
     case 'right':
       ctx.beginPath();
       ctx.moveTo(tileX + tileSize, tileY);
       ctx.lineTo(tileX + tileSize, tileY + tileSize);
       ctx.stroke();
       
+      // Draw the lever base
       ctx.beginPath();
-      ctx.arc(tileX + tileSize * 3/4, tileY + tileSize / 2, tileSize / 8, 0, Math.PI * 2);
+      ctx.moveTo(tileX + tileSize * 0.75, tileY + tileSize * 0.4);
+      ctx.lineTo(tileX + tileSize * 0.75, tileY + tileSize * 0.6);
       ctx.stroke();
       
+      // Draw the handle
       ctx.beginPath();
-      ctx.moveTo(tileX + tileSize * 3/4, tileY + tileSize / 2);
-      ctx.lineTo(tileX + tileSize * 7/8, tileY + tileSize * 3/4);
+      ctx.moveTo(tileX + tileSize * 0.95, tileY + tileSize * 0.5);
+      ctx.lineTo(tileX + tileSize * 0.75, tileY + tileSize * 0.5);
       ctx.stroke();
       break;
+      
     case 'bottom':
       ctx.beginPath();
       ctx.moveTo(tileX, tileY + tileSize);
       ctx.lineTo(tileX + tileSize, tileY + tileSize);
       ctx.stroke();
       
+      // Draw the lever base
       ctx.beginPath();
-      ctx.arc(tileX + tileSize / 2, tileY + tileSize * 3/4, tileSize / 8, 0, Math.PI * 2);
+      ctx.moveTo(tileX + tileSize * 0.4, tileY + tileSize * 0.75);
+      ctx.lineTo(tileX + tileSize * 0.6, tileY + tileSize * 0.75);
       ctx.stroke();
       
+      // Draw the handle
       ctx.beginPath();
-      ctx.moveTo(tileX + tileSize / 2, tileY + tileSize * 3/4);
-      ctx.lineTo(tileX + tileSize / 4, tileY + tileSize * 7/8);
+      ctx.moveTo(tileX + tileSize * 0.5, tileY + tileSize * 0.95);
+      ctx.lineTo(tileX + tileSize * 0.5, tileY + tileSize * 0.75);
       ctx.stroke();
       break;
+      
     case 'left':
       ctx.beginPath();
       ctx.moveTo(tileX, tileY);
       ctx.lineTo(tileX, tileY + tileSize);
       ctx.stroke();
       
+      // Draw the lever base
       ctx.beginPath();
-      ctx.arc(tileX + tileSize / 4, tileY + tileSize / 2, tileSize / 8, 0, Math.PI * 2);
+      ctx.moveTo(tileX + tileSize * 0.25, tileY + tileSize * 0.4);
+      ctx.lineTo(tileX + tileSize * 0.25, tileY + tileSize * 0.6);
       ctx.stroke();
       
+      // Draw the handle
       ctx.beginPath();
-      ctx.moveTo(tileX + tileSize / 4, tileY + tileSize / 2);
-      ctx.lineTo(tileX + tileSize / 8, tileY + tileSize / 4);
+      ctx.moveTo(tileX + tileSize * 0.05, tileY + tileSize * 0.5);
+      ctx.lineTo(tileX + tileSize * 0.25, tileY + tileSize * 0.5);
       ctx.stroke();
       break;
   }
