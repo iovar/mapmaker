@@ -7,7 +7,7 @@
   --hover-color: rgba(86, 146, 186, 0.2);
   --active-color: rgba(86, 146, 186, 0.5);
   --header-height: 50px;
-  --toolbar-width: 250px;
+  --toolbar-width: 280px;
   --classic-dungeon-color: #000;
   --old-school-blue-color: #5692ba;
 }
@@ -104,6 +104,7 @@ main {
   background-color: white;
   border-right: 1px solid var(--border-color);
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 15px;
 }
 
@@ -197,17 +198,19 @@ main {
   grid-template-columns: repeat(2, 1fr);
   gap: 5px;
   overflow-y: auto;
+  overflow-x: hidden;
   max-height: 300px;
 }
 
 .asset-item {
   border: 1px solid var(--border-color);
   border-radius: 3px;
-  padding: 5px;
+  padding: 4px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
 }
 
 .asset-item:hover {
@@ -220,8 +223,8 @@ main {
 }
 
 .asset-item img {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   object-fit: contain;
 }
 
@@ -232,6 +235,7 @@ main {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  width: 100%;
   max-width: 100%;
 }
 
@@ -370,5 +374,15 @@ main {
   
   .asset-container {
     max-height: 100px;
+  }
+  
+  .asset-item {
+    width: auto;
+    min-width: 40px;
+  }
+  
+  .asset-item img {
+    width: 24px;
+    height: 24px;
   }
 }
