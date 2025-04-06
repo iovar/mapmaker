@@ -214,11 +214,30 @@ function readMapFile(file) {
 }
 
 // Export the map as a PNG image
-function exportPNG(canvas) {
+function exportPNG(canvas, showGrid = true) {
   try {
-    // Create a download link
+    // Create a temporary canvas for the export
+    const exportCanvas = document.createElement('canvas');
+    exportCanvas.width = canvas.width;
+    exportCanvas.height = canvas.height;
+    const exportCtx = exportCanvas.getContext('2d');
+    
+    // Fill with white background
+    exportCtx.fillStyle = '#ffffff';
+    exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+    
+    // Draw the original canvas content
+    exportCtx.drawImage(canvas, 0, 0);
+    
+    // If the grid is enabled, make sure it's visible
+    if (showGrid) {
+      // The grid from the original canvas should already be visible
+      // If we need to force it, we would add code here to draw the grid
+    }
+    
+    // Create a download link with the white-background canvas
     const downloadLink = document.createElement('a');
-    downloadLink.href = canvas.toDataURL('image/png');
+    downloadLink.href = exportCanvas.toDataURL('image/png');
     
     // Ask for a name for the file
     const fileName = prompt('Enter a name for your map image:', 'Dungeon Map');
