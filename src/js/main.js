@@ -13,6 +13,7 @@ const state = {
   selectedTool: 'select',
   selectedEdgeType: 'wall',
   selectedAsset: null,
+  assetRotation: 0, // 0, 90, 180, or 270 degrees
   clipboard: null,
   selection: {
     active: false,
@@ -77,6 +78,25 @@ document.getElementById('zoom-reset').addEventListener('click', () => {
   redrawCanvas();
 });
 
+// Rotate the selected asset
+function rotateAsset() {
+  if (!state.selectedAsset) return;
+  
+  // Cycle through 0, 90, 180, 270 degrees
+  state.assetRotation = (state.assetRotation + 90) % 360;
+  
+  // Update UI to show rotation status
+  updateRotationStatus();
+}
+
+// Update rotation status indicator
+function updateRotationStatus() {
+  const rotateBtn = document.getElementById('rotate-asset');
+  if (rotateBtn) {
+    rotateBtn.innerHTML = `<span class="icon">&#8635;</span> ${state.assetRotation}°`;
+  }
+}
+
 // Initialize the application
 async function initializeApp() {
   // Load assets from themes
@@ -84,6 +104,13 @@ async function initializeApp() {
   
   // Set up initial canvas and interface
   createMapBtn.addEventListener('click', createNewMap);
+  
+  // Set up rotation button
+  const rotateBtn = document.getElementById('rotate-asset');
+  if (rotateBtn) {
+    rotateBtn.addEventListener('click', rotateAsset);
+    updateRotationStatus(); // Initialize rotation display
+  }
   
   // Set up tool buttons event listeners
   for (const toolId in toolButtons) {
@@ -158,6 +185,7 @@ function createMap(width, height, tileSize, theme) {
   state.map = Array(height).fill().map(() => Array(width).fill().map(() => ({
     type: 'empty',
     asset: null,
+    rotation: 0, // Store rotation for each tile
     edges: {
       top: null,
       right: null,
@@ -278,6 +306,10 @@ function filterAssets() {
 function selectAsset(asset) {
   state.selectedAsset = asset;
   
+  // Reset rotation when selecting a new asset
+  state.assetRotation = 0;
+  updateRotationStatus();
+  
   // Update UI
   const assetItems = assetList.querySelectorAll('.asset-item');
   assetItems.forEach(item => {
@@ -360,8 +392,13 @@ function setupCanvasEventListeners() {
       
       if (state.selectedAsset) {
         // Check if multi-tile asset fits
-        const assetWidth = state.selectedAsset.width || 1;
-        const assetHeight = state.selectedAsset.height || 1;
+        let assetWidth = state.selectedAsset.width || 1;
+        let assetHeight = state.selectedAsset.height || 1;
+        
+        // For 90 or 270 degree rotations, swap width and height
+        if (state.assetRotation === 90 || state.assetRotation === 270) {
+          [assetWidth, assetHeight] = [assetHeight, assetWidth];
+        }
         
         // Check if the asset would exceed map boundaries
         if (x + assetWidth > state.map[0].length || y + assetHeight > state.map.length) {
@@ -370,9 +407,10 @@ function setupCanvasEventListeners() {
           return;
         }
         
-        // Place the asset in the top-left tile
+        // Place the asset in the top-left tile with current rotation
         state.map[y][x].type = 'asset';
         state.map[y][x].asset = state.selectedAsset.name;
+        state.map[y][x].rotation = state.assetRotation;
         
         // Mark other tiles as empty to prevent drawing in them
         // This ensures the multi-tile asset is visible
@@ -491,17 +529,23 @@ function setupCanvasEventListeners() {
     } else if (state.selectedTool === 'fill') {
       if (state.selectedAsset) {
         // Check if multi-tile asset fits
-        const assetWidth = state.selectedAsset.width || 1;
-        const assetHeight = state.selectedAsset.height || 1;
+        let assetWidth = state.selectedAsset.width || 1;
+        let assetHeight = state.selectedAsset.height || 1;
+        
+        // For 90 or 270 degree rotations, swap width and height
+        if (state.assetRotation === 90 || state.assetRotation === 270) {
+          [assetWidth, assetHeight] = [assetHeight, assetWidth];
+        }
         
         // Check if the asset would exceed map boundaries
         if (x + assetWidth > state.map[0].length || y + assetHeight > state.map.length) {
           return; // Asset doesn't fit, skip placement
         }
         
-        // Place the asset in the top-left tile
+        // Place the asset in the top-left tile with current rotation
         state.map[y][x].type = 'asset';
         state.map[y][x].asset = state.selectedAsset.name;
+        state.map[y][x].rotation = state.assetRotation;
         
         // Mark other tiles as empty to prevent drawing in them
         for (let offsetY = 0; offsetY < assetHeight; offsetY++) {
@@ -590,6 +634,11 @@ function setupCanvasEventListeners() {
       if (state.selection.active) {
         deleteSelection();
       }
+    }
+    
+    // Rotate: R key
+    if (e.key === 'r' || e.key === 'R') {
+      rotateAsset();
     }
     
     // Escape: Deselect
@@ -730,8 +779,18 @@ function redrawCanvas() {
       } else if (tile.type === 'asset' && tile.asset) {
         const asset = findAssetByName(state.assets, state.theme, tile.asset);
         if (asset) {
-          // Pass the asset dimensions to drawTile
-          drawTile(ctx, x, y, state.tileSize, null, asset.path, asset.width, asset.height);
+          // Pass the asset dimensions and rotation to drawTile
+          drawTile(
+            ctx, 
+            x, 
+            y, 
+            state.tileSize, 
+            null, 
+            asset.path, 
+            asset.width, 
+            asset.height, 
+            tile.rotation || 0
+          );
         }
       }
       

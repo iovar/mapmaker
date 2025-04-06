@@ -37,7 +37,7 @@ function drawGrid(ctx, width, height, tileSize) {
 }
 
 // Draw a tile
-function drawTile(ctx, x, y, tileSize, fillColor, assetPath, assetWidth = 1, assetHeight = 1) {
+function drawTile(ctx, x, y, tileSize, fillColor, assetPath, assetWidth = 1, assetHeight = 1, rotation = 0) {
   const tileX = x * tileSize;
   const tileY = y * tileSize;
   
@@ -51,14 +51,54 @@ function drawTile(ctx, x, y, tileSize, fillColor, assetPath, assetWidth = 1, ass
     const drawWidth = tileSize * assetWidth;
     const drawHeight = tileSize * assetHeight;
     
-    // Use a closure to ensure the image is drawn only after loading
-    img.onload = () => {
-      ctx.drawImage(img, tileX, tileY, drawWidth, drawHeight);
+    // Draw with rotation if specified
+    const drawRotatedImage = () => {
+      ctx.save();
+      
+      if (rotation !== 0) {
+        // Calculate center for rotation
+        const centerX = tileX + drawWidth / 2;
+        const centerY = tileY + drawHeight / 2;
+        
+        // Convert rotation to radians
+        const rotationRad = (rotation * Math.PI) / 180;
+        
+        // Translate to center, rotate, and translate back
+        ctx.translate(centerX, centerY);
+        ctx.rotate(rotationRad);
+        
+        // For 90 or 270 degree rotations, swap width and height for proper fitting
+        if (rotation === 90 || rotation === 270) {
+          ctx.drawImage(
+            img,
+            -drawHeight / 2, // X offset adjusted for swapped dimensions
+            -drawWidth / 2,  // Y offset adjusted for swapped dimensions
+            drawHeight,      // Width and height swapped for rotated image
+            drawWidth
+          );
+        } else {
+          ctx.drawImage(
+            img,
+            -drawWidth / 2,  // X offset
+            -drawHeight / 2, // Y offset
+            drawWidth,
+            drawHeight
+          );
+        }
+      } else {
+        // No rotation, draw normally
+        ctx.drawImage(img, tileX, tileY, drawWidth, drawHeight);
+      }
+      
+      ctx.restore();
     };
+    
+    // Use a closure to ensure the image is drawn only after loading
+    img.onload = drawRotatedImage;
     
     // For already loaded images, draw immediately
     if (img.complete) {
-      ctx.drawImage(img, tileX, tileY, drawWidth, drawHeight);
+      drawRotatedImage();
     }
   } else {
     // Empty tile (white background)
