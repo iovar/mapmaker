@@ -196,7 +196,7 @@ main {
 
 .asset-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 5px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -206,7 +206,7 @@ main {
 .asset-item {
   border: 1px solid var(--border-color);
   border-radius: 3px;
-  padding: 3px;
+  padding: 2px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -234,14 +234,14 @@ main {
 }
 
 .asset-item span {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   text-align: center;
   margin-top: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
-  padding: 0 2px;
+  padding: 0 1px;
   max-width: 100%;
 }
 
@@ -381,7 +381,7 @@ main {
   
   .asset-container {
     max-height: 100px;
-    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
   }
   
   .asset-item {
@@ -405,7 +405,7 @@ main {
   }
   
   .asset-container {
-    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
   }
   
   .toolbar-item label {
