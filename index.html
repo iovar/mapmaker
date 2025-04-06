@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#5692ba">
+    <meta name="description" content="MapMaker - A dungeon map creator for AD&D 2nd edition style maps">
+    <title>MapMaker - AD&D Dungeon Creator</title>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="/src/css/main.css">
+    <link rel="icon" href="/img/site/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="/img/site/icon-192.png">
+</head>
+<body>
+    <header>
+        <div class="logo">MapMaker</div>
+        <nav class="menu">
+            <ul>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">File</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#" id="new-map">New Map</a></li>
+                        <li><a href="#" id="open-map">Open Map</a></li>
+                        <li><a href="#" id="save-map">Save Map</a></li>
+                        <li><a href="#" id="export-png">Export as PNG</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Edit</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#" id="undo">Undo</a></li>
+                        <li><a href="#" id="redo">Redo</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#" id="cut">Cut</a></li>
+                        <li><a href="#" id="copy">Copy</a></li>
+                        <li><a href="#" id="paste">Paste</a></li>
+                        <li><a href="#" id="delete">Delete</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">View</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#" id="zoom-in">Zoom In</a></li>
+                        <li><a href="#" id="zoom-out">Zoom Out</a></li>
+                        <li><a href="#" id="zoom-reset">Reset Zoom</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#" id="toggle-grid">Toggle Grid</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Help</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#" id="tutorial">Tutorial</a></li>
+                        <li><a href="#" id="about">About</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <aside class="toolbar">
+            <div class="toolbar-section">
+                <h3>Map Settings</h3>
+                <div class="toolbar-item">
+                    <label for="map-width">Width (tiles):</label>
+                    <input type="number" id="map-width" min="10" max="100" value="20">
+                </div>
+                <div class="toolbar-item">
+                    <label for="map-height">Height (tiles):</label>
+                    <input type="number" id="map-height" min="10" max="100" value="20">
+                </div>
+                <div class="toolbar-item">
+                    <label for="tile-size">Tile Size:</label>
+                    <select id="tile-size">
+                        <option value="16">16x16</option>
+                        <option value="24">24x24</option>
+                        <option value="32" selected>32x32</option>
+                        <option value="48">48x48</option>
+                        <option value="64">64x64</option>
+                    </select>
+                </div>
+                <div class="toolbar-item">
+                    <label for="theme-select">Theme:</label>
+                    <select id="theme-select">
+                        <option value="Classic Dungeon">Classic Dungeon</option>
+                        <option value="Old School Blue Dungeon">Old School Blue Dungeon</option>
+                    </select>
+                </div>
+                <button id="create-map">Create Map</button>
+            </div>
+
+            <div class="toolbar-section">
+                <h3>Tools</h3>
+                <div class="tool-buttons">
+                    <button class="tool-btn" id="tool-select" title="Select Area">
+                        <span class="icon">¡</span>
+                    </button>
+                    <button class="tool-btn" id="tool-fill" title="Fill Tile">
+                        <span class="icon"> </span>
+                    </button>
+                    <button class="tool-btn" id="tool-empty" title="Empty Tile">
+                        <span class="icon">¡</span>
+                    </button>
+                    <button class="tool-btn" id="tool-edge" title="Draw Edge">
+                        <span class="icon"></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="toolbar-section">
+                <h3>Edge Types</h3>
+                <div class="edge-buttons">
+                    <button class="edge-btn" id="edge-wall" title="Wall">
+                        <span class="icon"></span>
+                    </button>
+                    <button class="edge-btn" id="edge-cracked" title="Cracked Wall">
+                        <span class="icon">N</span>
+                    </button>
+                    <button class="edge-btn" id="edge-door" title="Door">
+                        <span class="icon">¬</span>
+                    </button>
+                    <button class="edge-btn" id="edge-window" title="Window">
+                        <span class="icon">a</span>
+                    </button>
+                    <button class="edge-btn" id="edge-secret" title="Secret Door">
+                        <span class="icon">Ä</span>
+                    </button>
+                    <button class="edge-btn" id="edge-trap" title="Trap">
+                        <span class="icon"> </span>
+                    </button>
+                    <button class="edge-btn" id="edge-lever" title="Lever">
+                        <span class="icon">™</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="toolbar-section">
+                <h3>Tile Assets</h3>
+                <div class="asset-search">
+                    <input type="text" id="asset-search" placeholder="Search assets...">
+                </div>
+                <div class="asset-container" id="asset-list">
+                    <!-- Assets will be loaded here dynamically -->
+                </div>
+            </div>
+        </aside>
+
+        <section class="canvas-container">
+            <div class="canvas-wrapper">
+                <canvas id="map-canvas"></canvas>
+            </div>
+        </section>
+    </main>
+
+    <div class="modal" id="new-map-modal">
+        <div class="modal-content">
+            <h2>Create New Map</h2>
+            <div class="form-group">
+                <label for="new-map-width">Width (tiles):</label>
+                <input type="number" id="new-map-width" min="10" max="100" value="20">
+            </div>
+            <div class="form-group">
+                <label for="new-map-height">Height (tiles):</label>
+                <input type="number" id="new-map-height" min="10" max="100" value="20">
+            </div>
+            <div class="form-group">
+                <label for="new-map-tile-size">Tile Size:</label>
+                <select id="new-map-tile-size">
+                    <option value="16">16x16</option>
+                    <option value="24">24x24</option>
+                    <option value="32" selected>32x32</option>
+                    <option value="48">48x48</option>
+                    <option value="64">64x64</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="new-map-theme">Theme:</label>
+                <select id="new-map-theme">
+                    <option value="Classic Dungeon">Classic Dungeon</option>
+                    <option value="Old School Blue Dungeon">Old School Blue Dungeon</option>
+                </select>
+            </div>
+            <div class="modal-buttons">
+                <button id="new-map-cancel">Cancel</button>
+                <button id="new-map-create">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/src/js/main.js" type="module"></script>
+    <script>
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed: ', err));
+            });
+        }
+    </script>
+</body>
+</html>

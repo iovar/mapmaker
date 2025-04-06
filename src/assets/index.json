@@ -1,0 +1,14 @@
+{
+  "themes": [
+    {
+      "name": "Classic Dungeon",
+      "description": "Black and white classic dungeon style",
+      "color": "#000000"
+    },
+    {
+      "name": "Old School Blue Dungeon",
+      "description": "Blue-themed old school dungeon style",
+      "color": "#5692ba"
+    }
+  ]
+}
