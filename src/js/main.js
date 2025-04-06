@@ -233,7 +233,12 @@ function populateAssetList() {
     img.alt = asset.name;
     
     const span = document.createElement('span');
-    span.textContent = asset.name.replace(/\\d+x\\d+$/, '');
+    // Remove 1x1 suffix and convert camelCase to space-separated words
+    span.textContent = asset.name
+      .replace(/\d+x\d+$/, '') // Remove 1x1, 2x2, etc.
+      .replace(/([A-Z])/g, ' $1') // Add space before capital letters
+      .replace(/^\s+/, '') // Remove leading space
+      .trim();
     
     assetItem.appendChild(img);
     assetItem.appendChild(span);
