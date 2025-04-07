@@ -1,43 +1,85 @@
-# MapMaker - AD&D Dungeon Creator
+# MapMaker - AD&D 2nd Edition Style Dungeon Map Creator
 
-A web-based dungeon map creator for AD&D 2nd edition style maps.
+MapMaker is a Progressive Web Application (PWA) for creating dungeon maps in the style of AD&D 2nd edition. It provides a simple, intuitive interface for placing tiles, drawing edges, and creating detailed dungeon layouts.
 
 ## Features
 
-- Create dungeon maps with customizable grid size and tile size
-- Classic AD&D 2nd edition style graphics
-- Multiple themes (Classic Dungeon and Old School Blue Dungeon)
-- Select from a variety of dungeon elements
-- Create walls, doors, secret doors, traps, and more
-- Copy, cut, paste, and delete selections
-- Save maps locally and export as PNG
+- Create maps with customizable tile sizes (16x16 to 64x64)
+- Choose from multiple dungeon themes (Classic Black and White, Old School Blue)
+- Place and rotate assets like tables, chairs, doors, and more
+- Draw different edge types (walls, cracked walls, doors, windows, secret doors, etc.)
+- Save and load maps locally or as files
+- Export maps as PNG images
 - Works offline as a Progressive Web App
+- Mobile-friendly responsive design
+
+## Getting Started
+
+1. Clone the repository
+2. Open `index.html` in your browser
+3. Configure your map size and theme
+4. Click "Create Map" to get started
 
 ## Usage
 
-1. Open the application in a web browser
-2. Set the map dimensions and tile size
-3. Select a theme
-4. Use the toolbar to add elements to your map
-5. Save your map or export as PNG
-6. Install as a PWA for offline use
+### Interface Controls
 
-## Installation
+- **Tools**:
+  - **Select**: Select areas of the map
+  - **Fill**: Place assets or fill tiles
+  - **Empty**: Clear tiles
+  - **Edge**: Draw walls and other edge elements
 
-As a Progressive Web App, MapMaker can be installed on your device:
+- **Edge Types**:
+  - Wall
+  - Cracked Wall
+  - Door
+  - Window
+  - Secret Door (S)
+  - Trap (T)
+  - Lever (L)
 
-1. Open the application in a supported browser
-2. Look for the "Add to Home Screen" or "Install" option
-3. Follow the prompts to install
+- **Keyboard Shortcuts**:
+  - **R**: Rotate selected asset
+  - **Ctrl+Z**: Undo
+  - **Ctrl+Y** or **Ctrl+Shift+Z**: Redo
+  - **Ctrl+C**: Copy selection
+  - **Ctrl+X**: Cut selection
+  - **Ctrl+V**: Paste selection
+  - **Delete**: Delete selection
+  - **Escape**: Cancel selection
 
-## Development
+### Mouse Controls
 
-To set up the development environment:
+- **Left Click**: Place assets, draw edges, or select areas
+- **Middle Click** or **Alt+Left Click**: Pan the map
+- **Mouse Wheel**: Zoom in/out
 
-1. Clone the repository
-2. Open the project folder
-3. Open `index.html` in a web browser
+## Map Management
 
-## License
+- **File Menu**:
+  - **New Map**: Create a new map with specified dimensions
+  - **Open Map**: Load a previously saved map
+  - **Save Map**: Save the current map to browser storage or as a file
+  - **Export as PNG**: Export the map as a PNG image
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+## Technical Details
+
+MapMaker is built using vanilla JavaScript, HTML5 Canvas, and CSS. It leverages modern browser features to provide a responsive and intuitive interface.
+
+- **Canvas API**: Used for drawing the map and assets
+- **Local Storage**: For saving maps in the browser
+- **File API**: For importing/exporting map files
+- **Service Worker**: For offline functionality
+
+## Asset System
+
+Assets are categorized by theme and can have varying dimensions (1x1, 2x1, etc.). When rotated, the application properly handles the dimensional changes (e.g., a 2x1 table becomes 1x2 when rotated 90°).
+
+## Future Enhancements
+
+- Add more themes and asset packs
+- Implement layer system for more complex maps
+- Add text annotations for rooms/areas
+- Provide a grid coordinate system
+- Support for hex-based maps

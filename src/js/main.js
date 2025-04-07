@@ -391,49 +391,68 @@ function setupCanvasEventListeners() {
       saveToHistory();
       
       if (state.selectedAsset) {
-        // Get asset dimensions
-        const assetWidth = state.selectedAsset.width || 1;
-        const assetHeight = state.selectedAsset.height || 1;
+        // COMPLETELY REWRITTEN ASSET PLACEMENT LOGIC
         
-        // Determine effective dimensions based on rotation
-        let effectiveWidth = assetWidth;
-        let effectiveHeight = assetHeight;
+        // Get original asset dimensions
+        const originalWidth = state.selectedAsset.width || 1;
+        const originalHeight = state.selectedAsset.height || 1;
         
-        // For 90° or 270° rotations, we need to swap width and height
+        // Calculate dimensions after rotation
+        let placementWidth, placementHeight;
+        
         if (state.assetRotation === 90 || state.assetRotation === 270) {
-          effectiveWidth = assetHeight;
-          effectiveHeight = assetWidth;
+          // For 90° and 270° rotations, swap width and height
+          placementWidth = originalHeight;
+          placementHeight = originalWidth;
+        } else {
+          // For 0° and 180° rotations, keep original dimensions
+          placementWidth = originalWidth;
+          placementHeight = originalHeight;
         }
         
-        // Check if the asset would exceed map boundaries with rotated dimensions
-        if (x + effectiveWidth > state.map[0].length || y + effectiveHeight > state.map.length) {
+        // Boundary check with rotated dimensions
+        if (x + placementWidth > state.map[0].length || y + placementHeight > state.map.length) {
           // Asset doesn't fit, show alert and return
-          alert(`This asset needs ${effectiveWidth}x${effectiveHeight} tiles of space, which exceeds the map boundaries at this position.`);
+          alert(`This asset needs ${placementWidth}x${placementHeight} tiles of space after rotation, which exceeds the map boundaries at this position.`);
           return;
         }
         
-        // Place the asset in the top-left tile
+        // Create an array to track all tiles that will be affected
+        const affectedTiles = [];
+        
+        // Mark all affected tiles
+        for (let dy = 0; dy < placementHeight; dy++) {
+          for (let dx = 0; dx < placementWidth; dx++) {
+            affectedTiles.push({x: x + dx, y: y + dy});
+          }
+        }
+        
+        // Clear all affected tiles first to avoid interference with existing assets
+        affectedTiles.forEach(tile => {
+          clearTile(state.map, tile.x, tile.y);
+        });
+        
+        // Now place the main asset tile at top-left
         state.map[y][x].type = 'asset';
         state.map[y][x].asset = state.selectedAsset.name;
         state.map[y][x].rotation = state.assetRotation;
         
-        // Store both original and effective dimensions to help with rendering
-        state.map[y][x].originalWidth = assetWidth;
-        state.map[y][x].originalHeight = assetHeight;
-        state.map[y][x].effectiveWidth = effectiveWidth;
-        state.map[y][x].effectiveHeight = effectiveHeight;
+        // Store both original and rotated dimensions
+        state.map[y][x].originalWidth = originalWidth;
+        state.map[y][x].originalHeight = originalHeight;
+        state.map[y][x].placementWidth = placementWidth;
+        state.map[y][x].placementHeight = placementHeight;
         
-        // Mark other tiles as empty to prevent drawing in them
-        // This ensures the multi-tile asset is visible
-        for (let offsetY = 0; offsetY < effectiveHeight; offsetY++) {
-          for (let offsetX = 0; offsetX < effectiveWidth; offsetX++) {
-            // Skip the top-left tile as it's already set
-            if (offsetX === 0 && offsetY === 0) continue;
-            
-            // Clear other tiles that will be covered by this asset
-            clearTile(state.map, x + offsetX, y + offsetY);
-          }
-        }
+        // Mark all other affected tiles as special "blocked" tiles
+        // These will be skipped during drawing since they're part of the larger asset
+        affectedTiles.forEach(tile => {
+          // Skip the origin tile which was already set
+          if (tile.x === x && tile.y === y) return;
+          
+          // Mark other tiles as blocked and point back to the origin
+          state.map[tile.y][tile.x].type = 'blocked';
+          state.map[tile.y][tile.x].blockedBy = {x, y};
+        });
       } else {
         state.map[y][x].type = 'fill';
         state.map[y][x].asset = null;
@@ -539,46 +558,65 @@ function setupCanvasEventListeners() {
       state.selection.endY = y;
     } else if (state.selectedTool === 'fill') {
       if (state.selectedAsset) {
-        // Get asset dimensions
-        const assetWidth = state.selectedAsset.width || 1;
-        const assetHeight = state.selectedAsset.height || 1;
+        // Get original asset dimensions
+        const originalWidth = state.selectedAsset.width || 1;
+        const originalHeight = state.selectedAsset.height || 1;
         
-        // Determine effective dimensions based on rotation
-        let effectiveWidth = assetWidth;
-        let effectiveHeight = assetHeight;
+        // Calculate dimensions after rotation
+        let placementWidth, placementHeight;
         
-        // For 90° or 270° rotations, we need to swap width and height
         if (state.assetRotation === 90 || state.assetRotation === 270) {
-          effectiveWidth = assetHeight;
-          effectiveHeight = assetWidth;
+          // For 90° and 270° rotations, swap width and height
+          placementWidth = originalHeight;
+          placementHeight = originalWidth;
+        } else {
+          // For 0° and 180° rotations, keep original dimensions
+          placementWidth = originalWidth;
+          placementHeight = originalHeight;
         }
         
-        // Check if the asset would exceed map boundaries with rotated dimensions
-        if (x + effectiveWidth > state.map[0].length || y + effectiveHeight > state.map.length) {
-          return; // Asset doesn't fit, skip placement
+        // Boundary check with rotated dimensions
+        if (x + placementWidth > state.map[0].length || y + placementHeight > state.map.length) {
+          // Asset doesn't fit, skip placement
+          return;
         }
         
-        // Place the asset in the top-left tile
+        // Create an array to track all tiles that will be affected
+        const affectedTiles = [];
+        
+        // Mark all affected tiles
+        for (let dy = 0; dy < placementHeight; dy++) {
+          for (let dx = 0; dx < placementWidth; dx++) {
+            affectedTiles.push({x: x + dx, y: y + dy});
+          }
+        }
+        
+        // Clear all affected tiles first to avoid interference with existing assets
+        affectedTiles.forEach(tile => {
+          clearTile(state.map, tile.x, tile.y);
+        });
+        
+        // Now place the main asset tile at top-left
         state.map[y][x].type = 'asset';
         state.map[y][x].asset = state.selectedAsset.name;
         state.map[y][x].rotation = state.assetRotation;
         
-        // Store both original and effective dimensions to help with rendering
-        state.map[y][x].originalWidth = assetWidth;
-        state.map[y][x].originalHeight = assetHeight;
-        state.map[y][x].effectiveWidth = effectiveWidth;
-        state.map[y][x].effectiveHeight = effectiveHeight;
+        // Store both original and rotated dimensions
+        state.map[y][x].originalWidth = originalWidth;
+        state.map[y][x].originalHeight = originalHeight;
+        state.map[y][x].placementWidth = placementWidth;
+        state.map[y][x].placementHeight = placementHeight;
         
-        // Mark other tiles as empty to prevent drawing in them
-        for (let offsetY = 0; offsetY < effectiveHeight; offsetY++) {
-          for (let offsetX = 0; offsetX < effectiveWidth; offsetX++) {
-            // Skip the top-left tile as it's already set
-            if (offsetX === 0 && offsetY === 0) continue;
-            
-            // Clear other tiles that will be covered by this asset
-            clearTile(state.map, x + offsetX, y + offsetY);
-          }
-        }
+        // Mark all other affected tiles as special "blocked" tiles
+        // These will be skipped during drawing since they're part of the larger asset
+        affectedTiles.forEach(tile => {
+          // Skip the origin tile which was already set
+          if (tile.x === x && tile.y === y) return;
+          
+          // Mark other tiles as blocked and point back to the origin
+          state.map[tile.y][tile.x].type = 'blocked';
+          state.map[tile.y][tile.x].blockedBy = {x, y};
+        });
       } else {
         state.map[y][x].type = 'fill';
         state.map[y][x].asset = null;
@@ -592,6 +630,11 @@ function setupCanvasEventListeners() {
   
   // Mouse up event
   canvas.addEventListener('mouseup', () => {
+    // If we were drawing and not panning, save state to history
+    if (isDrawing && !state.isPanning && state.selectedTool !== 'select') {
+      saveToHistory();
+    }
+    
     isDrawing = false;
     
     if (state.isPanning) {
@@ -801,7 +844,7 @@ function redrawCanvas() {
       } else if (tile.type === 'asset' && tile.asset) {
         const asset = findAssetByName(state.assets, state.theme, tile.asset);
         if (asset) {
-          // Get both original and effective dimensions
+          // Get dimensions
           const originalWidth = tile.originalWidth || asset.width || 1;
           const originalHeight = tile.originalHeight || asset.height || 1;
           
@@ -813,11 +856,14 @@ function redrawCanvas() {
             state.tileSize, 
             null, 
             asset.path, 
-            originalWidth,  // Always use original width from asset
-            originalHeight, // Always use original height from asset
+            originalWidth,
+            originalHeight,
             tile.rotation || 0
           );
         }
+      } else if (tile.type === 'blocked') {
+        // Skip blocked tiles - they're part of a larger asset
+        continue;
       }
       
       // Draw edges

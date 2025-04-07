@@ -1,7 +1,7 @@
 {
   "name": "MapMaker - AD&D Dungeon Creator",
   "short_name": "MapMaker",
-  "description": "Create dungeon maps in the style of AD&D 2nd edition",
+  "description": "A dungeon map creator for AD&D 2nd edition style maps",
   "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -10,14 +10,27 @@
     {
       "src": "/img/site/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
       "src": "/img/site/icon-512.png",
       "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/img/site/maskable-icon.png",
+      "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
+    }
+  ],
+  "orientation": "landscape",
+  "categories": ["productivity", "utilities", "games"],
+  "screenshots": [
+    {
+      "src": "/img/site/screenshot-1.png",
+      "sizes": "1280x720",
+      "type": "image/png"
     }
   ]
 }

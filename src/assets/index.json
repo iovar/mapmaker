@@ -1,14 +1,15 @@
 {
+  "version": "1.0",
   "themes": [
-    {
-      "name": "Classic Dungeon",
-      "description": "Black and white classic dungeon style",
+    "Classic Dungeon",
+    "Old School Blue Dungeon"
+  ],
+  "themeConfig": {
+    "Classic Dungeon": {
       "color": "#000000"
     },
-    {
-      "name": "Old School Blue Dungeon",
-      "description": "Blue-themed old school dungeon style",
+    "Old School Blue Dungeon": {
       "color": "#5692ba"
     }
-  ]
+  }
 }

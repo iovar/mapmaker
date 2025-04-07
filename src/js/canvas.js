@@ -132,16 +132,69 @@ function drawEdge(ctx, x, y, tileSize, edgePosition, edgeType, color) {
 
 // Clear a tile (set to empty)
 function clearTile(map, x, y) {
-  map[y][x] = {
-    type: 'empty',
-    asset: null,
-    edges: {
-      top: map[y][x].edges.top,
-      right: map[y][x].edges.right,
-      bottom: map[y][x].edges.bottom,
-      left: map[y][x].edges.left
+  // Check if this is a primary asset tile that has other blocked tiles
+  if (map[y][x].type === 'asset' && 
+      (map[y][x].placementWidth > 1 || map[y][x].placementHeight > 1)) {
+    
+    const width = map[y][x].placementWidth || 1;
+    const height = map[y][x].placementHeight || 1;
+    
+    // Clear all blocked tiles that belong to this asset
+    for (let dy = 0; dy < height; dy++) {
+      for (let dx = 0; dx < width; dx++) {
+        // Skip out-of-bounds checks
+        if (y + dy >= map.length || x + dx >= map[0].length) continue;
+        
+        // Clear each tile while preserving edges
+        map[y + dy][x + dx] = {
+          type: 'empty',
+          asset: null,
+          edges: {
+            top: map[y + dy][x + dx].edges?.top || null,
+            right: map[y + dy][x + dx].edges?.right || null,
+            bottom: map[y + dy][x + dx].edges?.bottom || null,
+            left: map[y + dy][x + dx].edges?.left || null
+          }
+        };
+      }
     }
-  };
+  } 
+  // If it's a blocked tile, find and clear the parent asset
+  else if (map[y][x].type === 'blocked' && map[y][x].blockedBy) {
+    const parentX = map[y][x].blockedBy.x;
+    const parentY = map[y][x].blockedBy.y;
+    
+    // Make sure the parent is within bounds
+    if (parentY < map.length && parentX < map[0].length) {
+      // Recursively clear the parent tile, which will also clear other blocked tiles
+      clearTile(map, parentX, parentY);
+    } else {
+      // If parent is out of bounds, just clear this tile
+      map[y][x] = {
+        type: 'empty',
+        asset: null,
+        edges: {
+          top: map[y][x].edges?.top || null,
+          right: map[y][x].edges?.right || null,
+          bottom: map[y][x].edges?.bottom || null,
+          left: map[y][x].edges?.left || null
+        }
+      };
+    }
+  }
+  // Otherwise just clear this single tile
+  else {
+    map[y][x] = {
+      type: 'empty',
+      asset: null,
+      edges: {
+        top: map[y][x].edges?.top || null,
+        right: map[y][x].edges?.right || null,
+        bottom: map[y][x].edges?.bottom || null,
+        left: map[y][x].edges?.left || null
+      }
+    };
+  }
 }
 
 // Draw a wall edge
