@@ -48,35 +48,49 @@ function drawTile(ctx, x, y, tileSize, fillColor, assetPath, assetWidth = 1, ass
     const img = new Image();
     img.src = assetPath;
     
-    const drawWidth = tileSize * assetWidth;
-    const drawHeight = tileSize * assetHeight;
+    let drawWidth = tileSize * assetWidth;
+    let drawHeight = tileSize * assetHeight;
+    
+    // Swap dimensions for 90 or 270 degree rotations
+    // This ensures rectangular tiles change shape appropriately
+    let effectiveWidth = assetWidth;
+    let effectiveHeight = assetHeight;
+    
+    if (rotation === 90 || rotation === 270) {
+      // Swap effective dimensions for boundary and calculation purposes
+      effectiveWidth = assetHeight;
+      effectiveHeight = assetWidth;
+    }
     
     // Draw with rotation if specified
     const drawRotatedImage = () => {
       ctx.save();
       
       if (rotation !== 0) {
-        // Calculate center for rotation
-        const centerX = tileX + drawWidth / 2;
-        const centerY = tileY + drawHeight / 2;
+        // For non-square tiles, we need to center differently
+        // Calculate the center for rotation
+        const centerTileX = tileX + (effectiveWidth * tileSize) / 2;
+        const centerTileY = tileY + (effectiveHeight * tileSize) / 2;
         
         // Convert rotation to radians
         const rotationRad = (rotation * Math.PI) / 180;
         
-        // Translate to center, rotate, and translate back
-        ctx.translate(centerX, centerY);
+        // Translate to center, rotate
+        ctx.translate(centerTileX, centerTileY);
         ctx.rotate(rotationRad);
         
-        // For 90 or 270 degree rotations, swap width and height for proper fitting
+        // Draw based on rotation
         if (rotation === 90 || rotation === 270) {
+          // Draw the rotated image with swapped dimensions
           ctx.drawImage(
             img,
-            -drawHeight / 2, // X offset adjusted for swapped dimensions
-            -drawWidth / 2,  // Y offset adjusted for swapped dimensions
-            drawHeight,      // Width and height swapped for rotated image
-            drawWidth
+            -drawHeight / 2, // X offset for rotated image
+            -drawWidth / 2,  // Y offset for rotated image
+            drawHeight,      // Swapped width
+            drawWidth        // Swapped height
           );
         } else {
+          // 180 degrees - no dimension swapping needed
           ctx.drawImage(
             img,
             -drawWidth / 2,  // X offset

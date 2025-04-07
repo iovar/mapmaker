@@ -801,7 +801,8 @@ function redrawCanvas() {
           const originalWidth = tile.originalWidth || asset.width || 1;
           const originalHeight = tile.originalHeight || asset.height || 1;
           
-          // Pass the asset dimensions and rotation to drawTile
+          // IMPORTANT: Let the draw function handle all the rotation logic
+          // to ensure consistent drawing across all use cases
           drawTile(
             ctx, 
             x, 
