@@ -44,57 +44,80 @@ function drawTile(ctx, x, y, tileSize, fillColor, assetPath, assetWidth = 1, ass
   if (fillColor) {
     ctx.fillStyle = fillColor;
     ctx.fillRect(tileX, tileY, tileSize, tileSize);
-  } else if (assetPath) {
-    const img = new Image();
-    img.src = assetPath;
-    
-    // Calculate the original and rotated dimensions
-    const originalWidth = assetWidth * tileSize;
-    const originalHeight = assetHeight * tileSize;
-    
-    // Function to draw the image with rotation
-    const drawRotatedImage = () => {
-      // For non-rotated images, draw normally
-      if (rotation === 0) {
-        ctx.drawImage(img, tileX, tileY, originalWidth, originalHeight);
-        return;
-      }
-      
-      // For rotated images, use a more complex approach
-      ctx.save();
-      
-      // Calculate the center point of the image
-      const centerX = tileX + originalWidth / 2;
-      const centerY = tileY + originalHeight / 2;
-      
-      // Move to the center, rotate, then draw
-      ctx.translate(centerX, centerY);
-      const rad = rotation * Math.PI / 180;
-      ctx.rotate(rad);
-      
-      // Draw the image centered at the origin (which is now centerX, centerY in the canvas)
-      if (rotation === 90 || rotation === 270) {
-        // For 90° and 270° rotations, swap the width and height
-        ctx.drawImage(img, -originalHeight / 2, -originalWidth / 2, originalHeight, originalWidth);
-      } else {
-        // For 180° rotation, keep the same dimensions
-        ctx.drawImage(img, -originalWidth / 2, -originalHeight / 2, originalWidth, originalHeight);
-      }
-      
-      ctx.restore();
-    };
-    
-    // Use a closure to ensure the image is drawn only after loading
-    img.onload = drawRotatedImage;
-    
-    // For already loaded images, draw immediately
-    if (img.complete) {
-      drawRotatedImage();
-    }
-  } else {
+    return;
+  } 
+  
+  if (!assetPath) {
     // Empty tile (white background)
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(tileX, tileY, tileSize, tileSize);
+    return;
+  }
+  
+  // We have an asset to draw
+  const img = new Image();
+  img.src = assetPath;
+  
+  // Function to draw the image with the correct rotation
+  const drawRotatedImage = () => {
+    // Original dimensions in pixels
+    const pixelWidth = assetWidth * tileSize;
+    const pixelHeight = assetHeight * tileSize;
+    
+    // For a non-rotated tile, draw normally
+    if (rotation === 0) {
+      ctx.drawImage(img, tileX, tileY, pixelWidth, pixelHeight);
+      return;
+    }
+    
+    // For rotated tiles, we need to handle the rotation properly
+    ctx.save();
+    
+    // Define actual dimensions based on rotation
+    let drawWidth, drawHeight;
+    if (rotation === 90 || rotation === 270) {
+      // When rotated 90 or 270 degrees, swap width and height
+      drawWidth = pixelHeight;
+      drawHeight = pixelWidth;
+    } else {
+      // When rotated 180 degrees, keep original dimensions
+      drawWidth = pixelWidth;
+      drawHeight = pixelHeight;
+    }
+    
+    // Determine the center point for rotation
+    // For non-rotated dimensions, this is the center of the original dimensions
+    // This ensures the rotation happens around the correct point
+    const centerX = tileX + pixelWidth / 2;
+    const centerY = tileY + pixelHeight / 2;
+    
+    // Move to the center point
+    ctx.translate(centerX, centerY);
+    
+    // Apply rotation
+    const radians = rotation * Math.PI / 180;
+    ctx.rotate(radians);
+    
+    // Draw the image centered at the new origin
+    // This ensures the image is positioned correctly after rotation
+    if (rotation === 90 || rotation === 270) {
+      // For 90° and 270° rotations, swap width and height
+      ctx.drawImage(img, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
+    } else {
+      // For 180° rotation, keep original dimensions
+      ctx.drawImage(img, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
+    }
+    
+    // Restore the context to remove the transformation
+    ctx.restore();
+  };
+  
+  // Use a closure to ensure the image is drawn only after loading
+  img.onload = drawRotatedImage;
+  
+  // For already loaded images, draw immediately
+  if (img.complete) {
+    drawRotatedImage();
   }
 }
 

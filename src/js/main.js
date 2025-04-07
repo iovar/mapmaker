@@ -80,13 +80,161 @@ document.getElementById('zoom-reset').addEventListener('click', () => {
 
 // Rotate the selected asset
 function rotateAsset() {
-  if (!state.selectedAsset) return;
+  if (state.selection && state.selection.active) {
+    // Check if we have a single tile selected
+    const startX = Math.min(state.selection.startX, state.selection.endX);
+    const startY = Math.min(state.selection.startY, state.selection.endY);
+    const endX = Math.max(state.selection.startX, state.selection.endX);
+    const endY = Math.max(state.selection.startY, state.selection.endY);
+    
+    if (startX === endX && startY === endY) {
+      // We have a single tile selected
+      rotateAssetInPlace(startX, startY);
+      return;
+    }
+  }
   
-  // Cycle through 0, 90, 180, 270 degrees
-  state.assetRotation = (state.assetRotation + 90) % 360;
+  // If no selection or multiple tiles selected, just change the rotation for next placement
+  if (state.selectedAsset) {
+    // Cycle through 0, 90, 180, 270 degrees
+    state.assetRotation = (state.assetRotation + 90) % 360;
+    updateRotationStatus();
+  }
+}
+
+// Rotate an asset that's already placed on the map
+function rotateAssetInPlace(x, y) {
+  if (!state.map || y >= state.map.length || x >= state.map[0].length) return;
   
-  // Update UI to show rotation status
-  updateRotationStatus();
+  const tile = state.map[y][x];
+  
+  // If this is a blocked tile, find and rotate its parent instead
+  if (tile.type === 'blocked' && tile.blockedBy) {
+    rotateAssetInPlace(tile.blockedBy.x, tile.blockedBy.y);
+    return;
+  }
+  
+  // Only proceed if this is an asset tile
+  if (tile.type !== 'asset' || !tile.asset) return;
+  
+  // Find the asset
+  const asset = findAssetByName(state.assets, state.theme, tile.asset);
+  if (!asset) return;
+  
+  // Save history before making changes
+  saveToHistory();
+  
+  // Get original dimensions (always from the asset to ensure correct values)
+  const originalWidth = asset.width || 1;
+  const originalHeight = asset.height || 1;
+  
+  // For 1x1 tiles, just rotate the image without changing grid occupation
+  if (originalWidth === 1 && originalHeight === 1) {
+    // Cycle through 0, 90, 180, 270 degrees
+    tile.rotation = (tile.rotation + 90) % 360;
+    redrawCanvas();
+    return;
+  }
+  
+  // For multi-tile assets, we need to update the grid occupation
+  
+  // Calculate current placement dimensions based on current rotation
+  let currentWidth, currentHeight;
+  if (tile.rotation === 90 || tile.rotation === 270) {
+    // Currently rotated to have width and height swapped
+    currentWidth = originalHeight;
+    currentHeight = originalWidth;
+  } else {
+    // Original orientation (0° or 180°)
+    currentWidth = originalWidth;
+    currentHeight = originalHeight;
+  }
+  
+  // Calculate new rotation angle
+  const newRotation = (tile.rotation + 90) % 360;
+  
+  // Calculate new dimensions after rotation
+  let newWidth, newHeight;
+  if (newRotation === 90 || newRotation === 270) {
+    // Width and height will be swapped
+    newWidth = originalHeight;
+    newHeight = originalWidth;
+  } else {
+    // Original orientation
+    newWidth = originalWidth;
+    newHeight = originalHeight;
+  }
+  
+  // Check if the rotated asset would exceed map boundaries
+  if (x + newWidth > state.map[0].length || y + newHeight > state.map.length) {
+    alert(`Cannot rotate this asset as it would exceed the map boundaries.`);
+    return;
+  }
+  
+  // Clear all blocked tiles from the original placement
+  for (let dy = 0; dy < currentHeight; dy++) {
+    for (let dx = 0; dx < currentWidth; dx++) {
+      // Skip the primary tile
+      if (dx === 0 && dy === 0) continue;
+      
+      // Only clear tiles that are within bounds
+      if (y + dy < state.map.length && x + dx < state.map[0].length) {
+        // Only reset if it's a blocked tile that points to our primary tile
+        const blockedTile = state.map[y + dy][x + dx];
+        if (blockedTile.type === 'blocked' && 
+            blockedTile.blockedBy && 
+            blockedTile.blockedBy.x === x && 
+            blockedTile.blockedBy.y === y) {
+          
+          state.map[y + dy][x + dx] = {
+            type: 'empty',
+            asset: null,
+            edges: {
+              top: blockedTile.edges?.top || null,
+              right: blockedTile.edges?.right || null,
+              bottom: blockedTile.edges?.bottom || null,
+              left: blockedTile.edges?.left || null
+            }
+          };
+        }
+      }
+    }
+  }
+  
+  // Update the primary tile with new rotation and dimensions
+  // Store the original (non-rotated) dimensions so the drawing code can work correctly
+  tile.rotation = newRotation;
+  tile.originalWidth = originalWidth;
+  tile.originalHeight = originalHeight;
+  
+  // Add placement dimensions to properly occupy grid space
+  tile.placementWidth = newWidth;
+  tile.placementHeight = newHeight;
+  
+  // Create new blocked tiles
+  for (let dy = 0; dy < newHeight; dy++) {
+    for (let dx = 0; dx < newWidth; dx++) {
+      // Skip the primary tile
+      if (dx === 0 && dy === 0) continue;
+      
+      // Only set tiles that are within bounds
+      if (y + dy < state.map.length && x + dx < state.map[0].length) {
+        state.map[y + dy][x + dx] = {
+          type: 'blocked',
+          blockedBy: { x, y },
+          edges: {
+            top: state.map[y + dy][x + dx].edges?.top || null,
+            right: state.map[y + dy][x + dx].edges?.right || null,
+            bottom: state.map[y + dy][x + dx].edges?.bottom || null,
+            left: state.map[y + dy][x + dx].edges?.left || null
+          }
+        };
+      }
+    }
+  }
+  
+  // Redraw canvas to show the changes
+  redrawCanvas();
 }
 
 // Update rotation status indicator
@@ -391,17 +539,15 @@ function setupCanvasEventListeners() {
       saveToHistory();
       
       if (state.selectedAsset) {
-        // COMPLETELY REWRITTEN ASSET PLACEMENT LOGIC
-        
-        // Get original asset dimensions
+        // Get original asset dimensions from the asset itself
         const originalWidth = state.selectedAsset.width || 1;
         const originalHeight = state.selectedAsset.height || 1;
         
-        // Calculate dimensions after rotation
+        // Calculate dimensions for grid occupation based on rotation
         let placementWidth, placementHeight;
         
         if (state.assetRotation === 90 || state.assetRotation === 270) {
-          // For 90° and 270° rotations, swap width and height
+          // For 90° and 270° rotations, swap width and height for grid occupation
           placementWidth = originalHeight;
           placementHeight = originalWidth;
         } else {
@@ -437,9 +583,11 @@ function setupCanvasEventListeners() {
         state.map[y][x].asset = state.selectedAsset.name;
         state.map[y][x].rotation = state.assetRotation;
         
-        // Store both original and rotated dimensions
+        // Store original dimensions for drawing the asset correctly
         state.map[y][x].originalWidth = originalWidth;
         state.map[y][x].originalHeight = originalHeight;
+        
+        // Store placement dimensions for grid occupation
         state.map[y][x].placementWidth = placementWidth;
         state.map[y][x].placementHeight = placementHeight;
         
@@ -558,15 +706,15 @@ function setupCanvasEventListeners() {
       state.selection.endY = y;
     } else if (state.selectedTool === 'fill') {
       if (state.selectedAsset) {
-        // Get original asset dimensions
+        // Get original asset dimensions from the asset itself
         const originalWidth = state.selectedAsset.width || 1;
         const originalHeight = state.selectedAsset.height || 1;
         
-        // Calculate dimensions after rotation
+        // Calculate dimensions for grid occupation based on rotation
         let placementWidth, placementHeight;
         
         if (state.assetRotation === 90 || state.assetRotation === 270) {
-          // For 90° and 270° rotations, swap width and height
+          // For 90° and 270° rotations, swap width and height for grid occupation
           placementWidth = originalHeight;
           placementHeight = originalWidth;
         } else {
@@ -601,9 +749,11 @@ function setupCanvasEventListeners() {
         state.map[y][x].asset = state.selectedAsset.name;
         state.map[y][x].rotation = state.assetRotation;
         
-        // Store both original and rotated dimensions
+        // Store original dimensions for drawing the asset correctly
         state.map[y][x].originalWidth = originalWidth;
         state.map[y][x].originalHeight = originalHeight;
+        
+        // Store placement dimensions for grid occupation
         state.map[y][x].placementWidth = placementWidth;
         state.map[y][x].placementHeight = placementHeight;
         
@@ -838,13 +988,18 @@ function redrawCanvas() {
     for (let x = 0; x < width; x++) {
       const tile = state.map[y][x];
       
+      // Skip blocked tiles - they're part of a larger asset
+      if (tile.type === 'blocked') {
+        continue;
+      }
+      
       // Draw tile background
       if (tile.type === 'fill') {
         drawTile(ctx, x, y, state.tileSize, state.themeColor);
       } else if (tile.type === 'asset' && tile.asset) {
         const asset = findAssetByName(state.assets, state.theme, tile.asset);
         if (asset) {
-          // Get dimensions
+          // Get original dimensions from the asset
           const originalWidth = tile.originalWidth || asset.width || 1;
           const originalHeight = tile.originalHeight || asset.height || 1;
           
@@ -861,9 +1016,6 @@ function redrawCanvas() {
             tile.rotation || 0
           );
         }
-      } else if (tile.type === 'blocked') {
-        // Skip blocked tiles - they're part of a larger asset
-        continue;
       }
       
       // Draw edges
