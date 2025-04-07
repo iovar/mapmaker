@@ -391,33 +391,35 @@ function setupCanvasEventListeners() {
       saveToHistory();
       
       if (state.selectedAsset) {
-        // Check if multi-tile asset fits
-        let assetWidth = state.selectedAsset.width || 1;
-        let assetHeight = state.selectedAsset.height || 1;
+        // Get asset dimensions
+        const assetWidth = state.selectedAsset.width || 1;
+        const assetHeight = state.selectedAsset.height || 1;
         
-        // For 90 or 270 degree rotations, swap width and height for boundary checks
+        // Determine effective dimensions based on rotation
         let effectiveWidth = assetWidth;
         let effectiveHeight = assetHeight;
         
+        // For 90° or 270° rotations, we need to swap width and height
         if (state.assetRotation === 90 || state.assetRotation === 270) {
           effectiveWidth = assetHeight;
           effectiveHeight = assetWidth;
         }
         
-        // Check if the asset would exceed map boundaries
+        // Check if the asset would exceed map boundaries with rotated dimensions
         if (x + effectiveWidth > state.map[0].length || y + effectiveHeight > state.map.length) {
           // Asset doesn't fit, show alert and return
           alert(`This asset needs ${effectiveWidth}x${effectiveHeight} tiles of space, which exceeds the map boundaries at this position.`);
           return;
         }
         
-        // Place the asset in the top-left tile with current rotation and dimensions
+        // Place the asset in the top-left tile
         state.map[y][x].type = 'asset';
         state.map[y][x].asset = state.selectedAsset.name;
         state.map[y][x].rotation = state.assetRotation;
+        
+        // Store both original and effective dimensions to help with rendering
         state.map[y][x].originalWidth = assetWidth;
         state.map[y][x].originalHeight = assetHeight;
-        // Store the effective dimensions after rotation
         state.map[y][x].effectiveWidth = effectiveWidth;
         state.map[y][x].effectiveHeight = effectiveHeight;
         
@@ -537,31 +539,33 @@ function setupCanvasEventListeners() {
       state.selection.endY = y;
     } else if (state.selectedTool === 'fill') {
       if (state.selectedAsset) {
-        // Check if multi-tile asset fits
-        let assetWidth = state.selectedAsset.width || 1;
-        let assetHeight = state.selectedAsset.height || 1;
+        // Get asset dimensions
+        const assetWidth = state.selectedAsset.width || 1;
+        const assetHeight = state.selectedAsset.height || 1;
         
-        // For 90 or 270 degree rotations, swap width and height for boundary checks
+        // Determine effective dimensions based on rotation
         let effectiveWidth = assetWidth;
         let effectiveHeight = assetHeight;
         
+        // For 90° or 270° rotations, we need to swap width and height
         if (state.assetRotation === 90 || state.assetRotation === 270) {
           effectiveWidth = assetHeight;
           effectiveHeight = assetWidth;
         }
         
-        // Check if the asset would exceed map boundaries
+        // Check if the asset would exceed map boundaries with rotated dimensions
         if (x + effectiveWidth > state.map[0].length || y + effectiveHeight > state.map.length) {
           return; // Asset doesn't fit, skip placement
         }
         
-        // Place the asset in the top-left tile with current rotation and dimensions
+        // Place the asset in the top-left tile
         state.map[y][x].type = 'asset';
         state.map[y][x].asset = state.selectedAsset.name;
         state.map[y][x].rotation = state.assetRotation;
+        
+        // Store both original and effective dimensions to help with rendering
         state.map[y][x].originalWidth = assetWidth;
         state.map[y][x].originalHeight = assetHeight;
-        // Store the effective dimensions after rotation
         state.map[y][x].effectiveWidth = effectiveWidth;
         state.map[y][x].effectiveHeight = effectiveHeight;
         
@@ -797,12 +801,11 @@ function redrawCanvas() {
       } else if (tile.type === 'asset' && tile.asset) {
         const asset = findAssetByName(state.assets, state.theme, tile.asset);
         if (asset) {
-          // Get the original dimensions from the asset or the stored values
+          // Get both original and effective dimensions
           const originalWidth = tile.originalWidth || asset.width || 1;
           const originalHeight = tile.originalHeight || asset.height || 1;
           
-          // IMPORTANT: Let the draw function handle all the rotation logic
-          // to ensure consistent drawing across all use cases
+          // Draw the asset with proper dimensions and rotation
           drawTile(
             ctx, 
             x, 
@@ -810,8 +813,8 @@ function redrawCanvas() {
             state.tileSize, 
             null, 
             asset.path, 
-            originalWidth, 
-            originalHeight, 
+            originalWidth,  // Always use original width from asset
+            originalHeight, // Always use original height from asset
             tile.rotation || 0
           );
         }

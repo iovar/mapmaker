@@ -48,60 +48,37 @@ function drawTile(ctx, x, y, tileSize, fillColor, assetPath, assetWidth = 1, ass
     const img = new Image();
     img.src = assetPath;
     
-    let drawWidth = tileSize * assetWidth;
-    let drawHeight = tileSize * assetHeight;
+    // Calculate the original and rotated dimensions
+    const originalWidth = assetWidth * tileSize;
+    const originalHeight = assetHeight * tileSize;
     
-    // Swap dimensions for 90 or 270 degree rotations
-    // This ensures rectangular tiles change shape appropriately
-    let effectiveWidth = assetWidth;
-    let effectiveHeight = assetHeight;
-    
-    if (rotation === 90 || rotation === 270) {
-      // Swap effective dimensions for boundary and calculation purposes
-      effectiveWidth = assetHeight;
-      effectiveHeight = assetWidth;
-    }
-    
-    // Draw with rotation if specified
+    // Function to draw the image with rotation
     const drawRotatedImage = () => {
+      // For non-rotated images, draw normally
+      if (rotation === 0) {
+        ctx.drawImage(img, tileX, tileY, originalWidth, originalHeight);
+        return;
+      }
+      
+      // For rotated images, use a more complex approach
       ctx.save();
       
-      if (rotation !== 0) {
-        // For non-square tiles, we need to center differently
-        // Calculate the center for rotation
-        const centerTileX = tileX + (effectiveWidth * tileSize) / 2;
-        const centerTileY = tileY + (effectiveHeight * tileSize) / 2;
-        
-        // Convert rotation to radians
-        const rotationRad = (rotation * Math.PI) / 180;
-        
-        // Translate to center, rotate
-        ctx.translate(centerTileX, centerTileY);
-        ctx.rotate(rotationRad);
-        
-        // Draw based on rotation
-        if (rotation === 90 || rotation === 270) {
-          // Draw the rotated image with swapped dimensions
-          ctx.drawImage(
-            img,
-            -drawHeight / 2, // X offset for rotated image
-            -drawWidth / 2,  // Y offset for rotated image
-            drawHeight,      // Swapped width
-            drawWidth        // Swapped height
-          );
-        } else {
-          // 180 degrees - no dimension swapping needed
-          ctx.drawImage(
-            img,
-            -drawWidth / 2,  // X offset
-            -drawHeight / 2, // Y offset
-            drawWidth,
-            drawHeight
-          );
-        }
+      // Calculate the center point of the image
+      const centerX = tileX + originalWidth / 2;
+      const centerY = tileY + originalHeight / 2;
+      
+      // Move to the center, rotate, then draw
+      ctx.translate(centerX, centerY);
+      const rad = rotation * Math.PI / 180;
+      ctx.rotate(rad);
+      
+      // Draw the image centered at the origin (which is now centerX, centerY in the canvas)
+      if (rotation === 90 || rotation === 270) {
+        // For 90° and 270° rotations, swap the width and height
+        ctx.drawImage(img, -originalHeight / 2, -originalWidth / 2, originalHeight, originalWidth);
       } else {
-        // No rotation, draw normally
-        ctx.drawImage(img, tileX, tileY, drawWidth, drawHeight);
+        // For 180° rotation, keep the same dimensions
+        ctx.drawImage(img, -originalWidth / 2, -originalHeight / 2, originalWidth, originalHeight);
       }
       
       ctx.restore();
