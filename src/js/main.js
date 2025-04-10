@@ -965,6 +965,7 @@ function toggleGrid() {
   redrawCanvas();
 }
 
+
 // Redraw the canvas
 function redrawCanvas() {
   if (!state.map) return;

@@ -41,83 +41,77 @@ function drawTile(ctx, x, y, tileSize, fillColor, assetPath, assetWidth = 1, ass
   const tileX = x * tileSize;
   const tileY = y * tileSize;
   
+  // Handle simple fill case
   if (fillColor) {
     ctx.fillStyle = fillColor;
     ctx.fillRect(tileX, tileY, tileSize, tileSize);
     return;
   } 
   
+  // Handle empty tile case
   if (!assetPath) {
-    // Empty tile (white background)
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(tileX, tileY, tileSize, tileSize);
     return;
   }
   
-  // We have an asset to draw
+  // Load the image
   const img = new Image();
   img.src = assetPath;
   
-  // Function to draw the image with the correct rotation
-  const drawRotatedImage = () => {
-    // Original dimensions in pixels
-    const pixelWidth = assetWidth * tileSize;
-    const pixelHeight = assetHeight * tileSize;
+  const drawImage = () => {
+    // Calculate original dimensions in pixels
+    const originalWidth = assetWidth * tileSize;
+    const originalHeight = assetHeight * tileSize;
     
-    // For a non-rotated tile, draw normally
+    // No rotation case - simple draw
     if (rotation === 0) {
-      ctx.drawImage(img, tileX, tileY, pixelWidth, pixelHeight);
+      ctx.drawImage(img, tileX, tileY, originalWidth, originalHeight);
       return;
     }
     
-    // For rotated tiles, we need to handle the rotation properly
+    // For rotated images, we need to rotate around the center
     ctx.save();
     
-    // Define actual dimensions based on rotation
-    let drawWidth, drawHeight;
-    if (rotation === 90 || rotation === 270) {
-      // When rotated 90 or 270 degrees, swap width and height
-      drawWidth = pixelHeight;
-      drawHeight = pixelWidth;
+    // For 90° and 270° rotations of rectangular assets, we need to adjust positioning
+    if ((rotation === 90 || rotation === 270) && assetWidth !== assetHeight) {
+      // When width != height and we're at 90° or 270°, 
+      // we need to center on the rotated dimensions
+      
+      // For a 2x1 tile rotating 90°, the center point needs to be at the
+      // center of the 1x2 grid space it now occupies
+      
+      // Calculate the center of the rotated placement area
+      const placementCenterX = tileX + (assetHeight * tileSize) / 2;
+      const placementCenterY = tileY + (assetWidth * tileSize) / 2;
+      
+      // Translate to this center, rotate, and draw
+      ctx.translate(placementCenterX, placementCenterY);
+      ctx.rotate(rotation * Math.PI / 180);
+      
+      // Draw the image centered on the rotation point
+      ctx.drawImage(img, -originalWidth/2, -originalHeight/2, originalWidth, originalHeight);
     } else {
-      // When rotated 180 degrees, keep original dimensions
-      drawWidth = pixelWidth;
-      drawHeight = pixelHeight;
+      // For square assets or 180° rotation, the center stays the same
+      const centerX = tileX + originalWidth / 2;
+      const centerY = tileY + originalHeight / 2;
+      
+      ctx.translate(centerX, centerY);
+      ctx.rotate(rotation * Math.PI / 180);
+      
+      // Draw the image centered on the rotation point
+      ctx.drawImage(img, -originalWidth/2, -originalHeight/2, originalWidth, originalHeight);
     }
     
-    // Determine the center point for rotation
-    // For non-rotated dimensions, this is the center of the original dimensions
-    // This ensures the rotation happens around the correct point
-    const centerX = tileX + pixelWidth / 2;
-    const centerY = tileY + pixelHeight / 2;
-    
-    // Move to the center point
-    ctx.translate(centerX, centerY);
-    
-    // Apply rotation
-    const radians = rotation * Math.PI / 180;
-    ctx.rotate(radians);
-    
-    // Draw the image centered at the new origin
-    // This ensures the image is positioned correctly after rotation
-    if (rotation === 90 || rotation === 270) {
-      // For 90° and 270° rotations, swap width and height
-      ctx.drawImage(img, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
-    } else {
-      // For 180° rotation, keep original dimensions
-      ctx.drawImage(img, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
-    }
-    
-    // Restore the context to remove the transformation
+    // Restore the context
     ctx.restore();
   };
   
-  // Use a closure to ensure the image is drawn only after loading
-  img.onload = drawRotatedImage;
-  
-  // For already loaded images, draw immediately
+  // Handle image loading
   if (img.complete) {
-    drawRotatedImage();
+    drawImage();
+  } else {
+    img.onload = drawImage;
   }
 }
 
