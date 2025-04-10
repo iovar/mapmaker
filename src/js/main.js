@@ -68,6 +68,8 @@ document.getElementById('new-map-create').addEventListener('click', createNewMap
 document.getElementById('save-map').addEventListener('click', () => saveMap(state.map, state.theme, state.tileSize));
 document.getElementById('open-map').addEventListener('click', loadSavedMap);
 document.getElementById('export-png').addEventListener('click', () => exportPNG(canvas, state.showGrid));
+document.getElementById('about').addEventListener('click', () => showModal('about-modal'));
+document.getElementById('about-close').addEventListener('click', () => hideModal('about-modal'));
 document.getElementById('undo').addEventListener('click', undo);
 document.getElementById('redo').addEventListener('click', redo);
 document.getElementById('toggle-grid').addEventListener('click', toggleGrid);

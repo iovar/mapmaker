@@ -390,6 +390,39 @@ main {
   border: none;
 }
 
+/* About modal specific styles */
+#about-modal .modal-content {
+  max-width: 500px;
+}
+
+#about-modal h3 {
+  margin-top: 15px;
+  margin-bottom: 8px;
+  color: var(--primary-color);
+}
+
+#about-modal p {
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+#about-modal ul {
+  margin-left: 20px;
+  margin-bottom: 15px;
+}
+
+#about-modal li {
+  margin-bottom: 5px;
+  line-height: 1.4;
+}
+
+#about-close {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  min-width: 100px;
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
   main {

@@ -50,7 +50,6 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle">Help</a>
                     <ul class="dropdown-menu">
-                        <li><a href="#" id="tutorial">Tutorial</a></li>
                         <li><a href="#" id="about">About</a></li>
                     </ul>
                 </li>
@@ -190,6 +189,34 @@
             <div class="modal-buttons">
                 <button id="new-map-cancel">Cancel</button>
                 <button id="new-map-create">Create</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="about-modal">
+        <div class="modal-content">
+            <h2>About MapMaker</h2>
+            <p>MapMaker is a Progressive Web App for creating dungeon maps in the style of AD&D 2nd edition.</p>
+            <h3>Features</h3>
+            <ul>
+                <li>Create maps with customizable tile sizes (16x16 to 64x64)</li>
+                <li>Choose from multiple dungeon themes</li>
+                <li>Place and rotate assets like tables, chairs, doors, and more</li>
+                <li>Draw different edge types (walls, doors, windows, etc.)</li>
+                <li>Save and load maps</li>
+                <li>Export maps as PNG images</li>
+                <li>Works offline as a Progressive Web App</li>
+            </ul>
+            <h3>Controls</h3>
+            <ul>
+                <li><strong>R key</strong>: Rotate selected asset</li>
+                <li><strong>Ctrl+Z</strong>: Undo</li>
+                <li><strong>Ctrl+Y</strong>: Redo</li>
+                <li><strong>Mouse wheel</strong>: Zoom in/out</li>
+                <li><strong>Middle click/Alt+drag</strong>: Pan the map</li>
+            </ul>
+            <div class="modal-buttons">
+                <button id="about-close">Close</button>
             </div>
         </div>
     </div>
