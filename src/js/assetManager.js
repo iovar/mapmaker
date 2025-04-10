@@ -3,14 +3,14 @@
 // Load all assets from the themes
 async function loadAssets() {
   const assets = {};
-  
+
   try {
     // Load Classic Dungeon assets
     assets['Classic Dungeon'] = await loadThemeAssets('Classic Dungeon');
-    
+
     // Load Old School Blue Dungeon assets
     assets['Old School Blue Dungeon'] = await loadThemeAssets('Old School Blue Dungeon');
-    
+
     return assets;
   } catch (error) {
     console.error('Error loading assets:', error);
@@ -21,19 +21,19 @@ async function loadAssets() {
 // Load assets for a specific theme
 async function loadThemeAssets(themeName) {
   const themeAssets = [];
-  
+
   try {
     // Fetch list of assets in the theme directory
-    const response = await fetch(`/src/assets/${themeName}/index.json`);
-    
+    const response = await fetch(`src/assets/${themeName}/index.json`);
+
     // If the index.json file exists, use it to load assets
     if (response.ok) {
       const index = await response.json();
-      
+
       index.files.forEach(file => {
         themeAssets.push({
           name: file.name,
-          path: `/src/assets/${themeName}/${file.filename}`,
+          path: `src/assets/${themeName}/${file.filename}`,
           width: file.width || 1,
           height: file.height || 1
         });
@@ -41,25 +41,25 @@ async function loadThemeAssets(themeName) {
     } else {
       // Otherwise, use the hard-coded asset list
       // This is a fallback in case the index.json doesn't exist
-      
+
       // Get the base asset list from the theme's directory structure
       const baseAssets = getDefaultAssetList(themeName);
-      
+
       baseAssets.forEach(assetName => {
         // Extract dimensions from the asset name (e.g., "TableLong2x1" -> width=2, height=1)
         const dimensionMatch = assetName.match(/(\d+)x(\d+)$/);
         const width = dimensionMatch ? parseInt(dimensionMatch[1], 10) : 1;
         const height = dimensionMatch ? parseInt(dimensionMatch[2], 10) : 1;
-        
+
         themeAssets.push({
           name: assetName,
-          path: `/src/assets/${themeName}/${assetName}.png`,
+          path: `src/assets/${themeName}/${assetName}.png`,
           width: width,
           height: height
         });
       });
     }
-    
+
     return themeAssets;
   } catch (error) {
     console.error(`Error loading assets for theme ${themeName}:`, error);
@@ -164,10 +164,10 @@ function getDefaultAssetList(themeName) {
 // Get hard-coded asset list if loading fails
 function getHardcodedAssetList(themeName) {
   const assetNames = getDefaultAssetList(themeName);
-  
+
   return assetNames.map(assetName => ({
     name: assetName,
-    path: `/src/assets/${themeName}/${assetName}.png`,
+    path: `src/assets/${themeName}/${assetName}.png`,
     width: 1,
     height: 1
   }));
